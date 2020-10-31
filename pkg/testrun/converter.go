@@ -1,13 +1,11 @@
-// Package gtr defines a standard test report format and provides convenience
-// methods to create and convert reports.
-package gtr
+package testrun
 
 import (
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/jstemmer/go-junit-report/pkg/junit"
+	"github.com/mjidris/go-junit-report/junit"
 )
 
 var (
@@ -15,93 +13,7 @@ var (
 	propFieldsFunc = func(r rune) bool { return r == ':' || r == ' ' }
 )
 
-type Report struct {
-	Packages []Package
-}
-
-func (r *Report) HasFailures() bool {
-	for _, pkg := range r.Packages {
-		for _, t := range pkg.Tests {
-			if t.Result == Fail {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-type Package struct {
-	Name     string
-	Duration time.Duration
-	Coverage float64
-	Output   []string
-
-	Tests      []Test
-	Benchmarks []Benchmark
-
-	BuildError Error
-	RunError   Error
-}
-
-type Test struct {
-	Name     string
-	Duration time.Duration
-	Result   Result
-	Level    int
-	Output   []string
-}
-
-type Benchmark struct {
-	Name        string
-	Result      Result
-	Output      []string
-	Iterations  int64
-	NsPerOp     float64
-	MBPerSec    float64
-	BytesPerOp  int64
-	AllocsPerOp int64
-}
-
-type Error struct {
-	Name     string
-	Duration time.Duration
-	Cause    string
-	Output   []string
-}
-
-// FromEvents creates a Report from the given list of events.
-// TODO: make packageName optional option
-func FromEvents(events []Event, packageName string) Report {
-	report := NewReportBuilder(packageName)
-	for _, ev := range events {
-		switch ev.Type {
-		case "run_test":
-			report.CreateTest(ev.Name)
-		case "pause_test":
-			report.PauseTest(ev.Name)
-		case "cont_test":
-			report.ContinueTest(ev.Name)
-		case "end_test":
-			report.EndTest(ev.Name, ev.Result, ev.Duration, ev.Indent)
-		case "benchmark":
-			report.Benchmark(ev.Name, ev.Iterations, ev.NsPerOp, ev.MBPerSec, ev.BytesPerOp, ev.AllocsPerOp)
-		case "status":
-			report.End()
-		case "summary":
-			report.CreatePackage(ev.Name, ev.Result, ev.Duration, ev.Data)
-		case "coverage":
-			report.Coverage(ev.CovPct, ev.CovPackages)
-		case "build_output":
-			report.CreateBuildError(ev.Name)
-		case "output":
-			report.AppendOutput(ev.Data)
-		default:
-			fmt.Printf("unhandled event type: %v\n", ev.Type)
-		}
-	}
-	return report.Build()
-}
-
+// This can be it's own package
 // JUnit converts the given report to a collection of JUnit Testsuites.
 func JUnit(report Report) junit.Testsuites {
 	var suites junit.Testsuites
