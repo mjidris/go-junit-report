@@ -58,6 +58,12 @@ func (p *Package) AddTest(t Test) {
 	p.Tests = append(p.Tests, t)
 }
 
+func (p *Package) AddTests(tests ...Test) {
+	for _, t := range tests {
+		p.AddTest(t)
+	}
+}
+
 type Test struct {
 	Name     string
 	Duration time.Duration
