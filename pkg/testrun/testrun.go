@@ -28,6 +28,10 @@ func (r *Report) HasFailures() bool {
 	return false
 }
 
+func (r *Report) AddPackage(p Package) {
+	r.Packages = append(r.Packages, p)
+}
+
 type Package struct {
 	Name     string
 	Duration time.Duration
@@ -39,6 +43,11 @@ type Package struct {
 
 	BuildError Error
 	RunError   Error
+}
+
+func (p *Package) AddTest(t Test) {
+	p.Duration += t.Duration
+	p.Tests = append(p.Tests, t)
 }
 
 type Test struct {
