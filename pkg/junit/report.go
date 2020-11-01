@@ -19,10 +19,8 @@ type Report struct {
 // HasFailures returns true if the report contains any failures.
 func (r *Report) HasFailures() bool {
 	for _, p := range r.Packages {
-		for _, t := range p.Tests {
-			if t.Result == Fail {
-				return true
-			}
+		if p.HasFailures() {
+			return true
 		}
 	}
 	return false
@@ -43,6 +41,16 @@ type Package struct {
 
 	BuildError Error
 	RunError   Error
+}
+
+// HasFailures returns true if the package contains any failures.
+func (p *Package) HasFailures() bool {
+	for _, t := range p.Tests {
+		if t.Result == Fail {
+			return true
+		}
+	}
+	return false
 }
 
 func (p *Package) AddTest(t Test) {
