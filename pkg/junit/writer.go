@@ -1,25 +1,42 @@
 package junit
 
 import (
+	"encoding/xml"
 	"fmt"
-	"io"
-	"os"
+	"io/ioutil"
 )
 
-func Write(w io.Writer, xml interface{}) error {
-	enc := xml.NewEncoder(w)
-	enc.Indent("", "\t")
+// Write takes the given test stuites, marshals them into XML
+// and writes it to a file with the given name. If the file
+// name does not end with ".xml", the extension will be appended.
+// If another file with the same name exists in the same directory
+// it's contents will be overwritten with the test results.
+func Write(t Testsuites, file string) error {
+	// Check to see if we have a .xml file extension.
+	if len(file) < 3 || file[len(file)-3:] != ".xml" {
+		file += ".xml"
+	}
 
-	if err := enc.Encode(xml); err != nil {
-		fmt.Fprintf(os.Stderr, "Error writing XML: %s\n", err)
+	// Start by adding the standard XML header.
+	data := []byte(xml.Header)
+
+	// Marshal the test suite into an XML byte slice.
+	b, err := xml.MarshalIndent(t, "", "\t")
+	if err != nil {
+		fmt.Println("Could not marshal test suites:", err)
 		return err
 	}
 
-	if err := enc.Flush(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error flushing XML: %s\n", err)
+	// Join the two slices of pizza, uh, I mean bytes...
+	data = append(data, b...)
+
+	// Write the bytes to disk.
+	err = ioutil.WriteFile(file, data, 0644)
+	if err != nil {
+		fmt.Println("Error while writing test suites to file:", err)
 		return err
 	}
 
-	fmt.Fprintf(w, "\n")
+	fmt.Printf("Successfully wrote test suites to %s.\n", file)
 	return nil
 }
