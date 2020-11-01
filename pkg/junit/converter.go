@@ -1,11 +1,9 @@
-package testrun
+package junit
 
 import (
 	"fmt"
 	"strings"
 	"time"
-
-	"github.com/mjidris/go-junit-report/pkg/junit"
 )
 
 var (
@@ -15,96 +13,96 @@ var (
 
 // This can be it's own package
 // JUnit converts the given report to a collection of JUnit Testsuites.
-func JUnit(report Report) junit.Testsuites {
-	var suites junit.Testsuites
+func convert(report Report) testsuites {
+	var suites testsuites
 	for _, pkg := range report.Packages {
 		var duration time.Duration
-		suite := junit.Testsuite{Name: pkg.Name}
+		suite := testsuite{Name: pkg.Name}
 
 		if pkg.Coverage > 0 {
-			suite.AddProperty("coverage.statements.pct", fmt.Sprintf("%.2f", pkg.Coverage))
+			suite.addProperty("coverage.statements.pct", fmt.Sprintf("%.2f", pkg.Coverage))
 		}
 
 		for _, line := range pkg.Output {
 			if fields := strings.FieldsFunc(line, propFieldsFunc); len(fields) == 2 && propPrefixes[fields[0]] {
-				suite.AddProperty(fields[0], fields[1])
+				suite.addProperty(fields[0], fields[1])
 			}
 		}
 
 		for _, test := range pkg.Tests {
 			duration += test.Duration
 
-			tc := junit.Testcase{
+			tc := testcase{
 				Classname: pkg.Name,
 				Name:      test.Name,
-				Time:      junit.FormatDuration(test.Duration),
+				Time:      formatDuration(test.Duration),
 			}
 
 			if test.Result == Fail {
-				tc.Failure = &junit.Result{
+				tc.Failure = &exception{
 					Message: "Failed",
 					Data:    formatOutput(test.Output, test.Level),
 				}
 			} else if test.Result == Skip {
-				tc.Skipped = &junit.Result{
+				tc.Skipped = &exception{
 					Message: formatOutput(test.Output, test.Level),
 				}
 			}
 
-			suite.AddTestcase(tc)
+			suite.addTestcase(tc)
 		}
 
 		for _, bm := range mergeBenchmarks(pkg.Benchmarks) {
-			tc := junit.Testcase{
+			tc := testcase{
 				Classname: pkg.Name,
 				Name:      bm.Name,
-				Time:      junit.FormatBenchmarkTime(time.Duration(bm.NsPerOp)),
+				Time:      formatBenchmarkTime(time.Duration(bm.NsPerOp)),
 			}
 
 			if bm.Result == Fail {
-				tc.Failure = &junit.Result{
+				tc.Failure = &exception{
 					Message: "Failed",
 				}
 			}
 
-			suite.AddTestcase(tc)
+			suite.addTestcase(tc)
 		}
 
 		// JUnit doesn't have a good way of dealing with build or runtime
 		// errors that happen before a test has started, so we create a single
 		// failing test that contains the build error details.
 		if pkg.BuildError.Name != "" {
-			tc := junit.Testcase{
+			tc := testcase{
 				Classname: pkg.BuildError.Name,
 				Name:      pkg.BuildError.Cause,
-				Time:      junit.FormatDuration(0),
-				Failure: &junit.Result{
+				Time:      formatDuration(0),
+				Failure: &exception{
 					Message: "Failed",
 					Data:    strings.Join(pkg.BuildError.Output, "\n"),
 				},
 			}
-			suite.AddTestcase(tc)
+			suite.addTestcase(tc)
 		}
 
 		if pkg.RunError.Name != "" {
-			tc := junit.Testcase{
+			tc := testcase{
 				Classname: pkg.RunError.Name,
 				Name:      "Failure",
-				Time:      junit.FormatDuration(0),
-				Failure: &junit.Result{
+				Time:      formatDuration(0),
+				Failure: &exception{
 					Message: "Failed",
 					Data:    strings.Join(pkg.RunError.Output, "\n"),
 				},
 			}
-			suite.AddTestcase(tc)
+			suite.addTestcase(tc)
 		}
 
 		if (pkg.Duration) == 0 {
-			suite.Time = junit.FormatDuration(duration)
+			suite.Time = formatDuration(duration)
 		} else {
-			suite.Time = junit.FormatDuration(pkg.Duration)
+			suite.Time = formatDuration(pkg.Duration)
 		}
-		suites.AddSuite(suite)
+		suites.addSuite(suite)
 	}
 	return suites
 }

@@ -9,7 +9,7 @@ import (
 )
 
 // Testsuites is a collection of JUnit testsuites.
-type Testsuites struct {
+type testsuites struct {
 	XMLName xml.Name `xml:"testsuites"`
 
 	Name     string `xml:"name,attr,omitempty"`
@@ -19,11 +19,11 @@ type Testsuites struct {
 	Failures int    `xml:"failures,attr,omitempty"`
 	Disabled int    `xml:"disabled,attr,omitempty"`
 
-	Suites []Testsuite `xml:"testsuite,omitempty"`
+	Suites []testsuite `xml:"testsuite,omitempty"`
 }
 
-// AddSuite adds a Testsuite and updates this testssuites' totals.
-func (t *Testsuites) AddSuite(ts Testsuite) {
+// addSuite adds a Testsuite and updates this testssuites' totals.
+func (t *testsuites) addSuite(ts testsuite) {
 	t.Suites = append(t.Suites, ts)
 	t.Tests += ts.Tests
 	t.Errors += ts.Errors
@@ -32,7 +32,7 @@ func (t *Testsuites) AddSuite(ts Testsuite) {
 }
 
 // Testsuite is a single JUnit testsuite containing testcases.
-type Testsuite struct {
+type testsuite struct {
 	// required attributes
 	Name  string `xml:"name,attr"`
 	Tests int    `xml:"tests,attr"`
@@ -48,17 +48,17 @@ type Testsuite struct {
 	Time      string `xml:"time,attr"`                // duration in seconds
 	Timestamp string `xml:"timestamp,attr,omitempty"` // date and time in ISO8601
 
-	Properties []Property `xml:"properties>property,omitempty"`
-	Testcases  []Testcase `xml:"testcase,omitempty"`
+	Properties []property `xml:"properties>property,omitempty"`
+	Testcases  []testcase `xml:"testcase,omitempty"`
 	SystemOut  string     `xml:"system-out,omitempty"`
 	SystemErr  string     `xml:"system-err,omitempty"`
 }
 
-func (t *Testsuite) AddProperty(name, value string) {
-	t.Properties = append(t.Properties, Property{Name: name, Value: value})
+func (t *testsuite) addProperty(name, value string) {
+	t.Properties = append(t.Properties, property{Name: name, Value: value})
 }
 
-func (t *Testsuite) AddTestcase(tc Testcase) {
+func (t *testsuite) addTestcase(tc testcase) {
 	t.Testcases = append(t.Testcases, tc)
 	t.Tests += 1
 
@@ -71,12 +71,12 @@ func (t *Testsuite) AddTestcase(tc Testcase) {
 	}
 }
 
-func (ts *Testsuite) SetTimestamp(t time.Time) {
-	ts.Timestamp = t.Format(time.RFC3339)
+func (t *testsuite) setTimestamp(u time.Time) {
+	t.Timestamp = u.Format(time.RFC3339)
 }
 
 // Testcase represents a single test with its results.
-type Testcase struct {
+type testcase struct {
 	// required attributes
 	Name      string `xml:"name,attr"`
 	Classname string `xml:"classname,attr"`
@@ -85,34 +85,35 @@ type Testcase struct {
 	Time   string `xml:"time,attr,omitempty"` // duration in seconds
 	Status string `xml:"status,attr,omitempty"`
 
-	Skipped   *Result `xml:"skipped,omitempty"`
-	Error     *Result `xml:"error,omitempty"`
-	Failure   *Result `xml:"failure,omitempty"`
-	SystemOut string  `xml:"system-out,omitempty"`
-	SystemErr string  `xml:"system-err,omitempty"`
+	Skipped   *exception `xml:"skipped,omitempty"`
+	Error     *exception `xml:"error,omitempty"`
+	Failure   *exception `xml:"failure,omitempty"`
+	SystemOut string     `xml:"system-out,omitempty"`
+	SystemErr string     `xml:"system-err,omitempty"`
 }
 
 // Property represents a key/value pair.
-type Property struct {
+type property struct {
 	Name  string `xml:"name,attr"`
 	Value string `xml:"value,attr"`
 }
 
-// Result represents the result of a single test.
-type Result struct {
+// Exception represents the results of a test that was failed, was skipped
+// or had an error.
+type exception struct {
 	Message string `xml:"message,attr"`
 	Type    string `xml:"type,attr,omitempty"`
 	Data    string `xml:",chardata"`
 }
 
-// FormatDuration returns the JUnit string representation of the given
+// formatDuration returns the JUnit string representation of the given
 // duration.
-func FormatDuration(d time.Duration) string {
+func formatDuration(d time.Duration) string {
 	return fmt.Sprintf("%.3f", d.Seconds())
 }
 
-// FormatBenchmarkTime returns the JUnit string representation of the given
+// formatBenchmarkTime returns the JUnit string representation of the given
 // benchmark time.
-func FormatBenchmarkTime(d time.Duration) string {
+func formatBenchmarkTime(d time.Duration) string {
 	return fmt.Sprintf("%.9f", d.Seconds())
 }

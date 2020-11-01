@@ -8,14 +8,14 @@ import (
 )
 
 func TestMarshalUnmarshal(t *testing.T) {
-	suites := Testsuites{
+	suites := testsuites{
 		Name:     "name",
 		Time:     "12.345",
 		Tests:    1,
 		Errors:   1,
 		Failures: 1,
 		Disabled: 1,
-		Suites: []Testsuite{
+		Suites: []testsuite{
 			{
 				Name:       "suite1",
 				Tests:      1,
@@ -27,16 +27,16 @@ func TestMarshalUnmarshal(t *testing.T) {
 				Skipped:    1,
 				Time:       "12.345",
 				Timestamp:  "2012-03-09T14:38:06+01:00",
-				Properties: []Property{{"key", "value"}},
-				Testcases: []Testcase{
+				Properties: []property{{"key", "value"}},
+				Testcases: []testcase{
 					{
 						Name:      "test1",
 						Classname: "class",
 						Time:      "12.345",
 						Status:    "status",
-						Skipped:   &Result{Message: "skipped", Type: "type", Data: "data"},
-						Error:     &Result{Message: "error", Type: "type", Data: "data"},
-						Failure:   &Result{Message: "failure", Type: "type", Data: "data"},
+						Skipped:   &exception{Message: "skipped", Type: "type", Data: "data"},
+						Error:     &exception{Message: "error", Type: "type", Data: "data"},
+						Failure:   &exception{Message: "failure", Type: "type", Data: "data"},
 						SystemOut: "system-out",
 						SystemErr: "system-err",
 					},
@@ -52,7 +52,7 @@ func TestMarshalUnmarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var unmarshaled Testsuites
+	var unmarshaled testsuites
 	if err := xml.Unmarshal(data, &unmarshaled); err != nil {
 		t.Fatal(err)
 	}

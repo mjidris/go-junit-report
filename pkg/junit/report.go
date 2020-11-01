@@ -1,4 +1,4 @@
-package testrun
+package junit
 
 import "time"
 
@@ -17,7 +17,7 @@ type Report struct {
 }
 
 // This function is used to set an error exit code. Unsure if we actually need this.
-func (r *Report) HasFailures() bool {
+func (r *Report) hasFailures() bool {
 	for _, pkg := range r.Packages {
 		for _, t := range pkg.Tests {
 			if t.Result == Fail {
