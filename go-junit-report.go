@@ -1,13 +1,8 @@
 package main
 
 import (
-	"encoding/xml"
 	"flag"
 	"fmt"
-	"os"
-
-	"github.com/jstemmer/go-junit-report/pkg/gtr"
-	"github.com/jstemmer/go-junit-report/pkg/parser/gotest"
 )
 
 var (
@@ -19,48 +14,5 @@ var (
 )
 
 func main() {
-	flag.Parse()
-
-	if flag.NArg() != 0 {
-		fmt.Fprintf(os.Stderr, "%s does not accept positional arguments\n", os.Args[0])
-		flag.Usage()
-		os.Exit(1)
-	}
-
-	// Read input
-	events, err := gotest.Parse(os.Stdin)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading input: %s\n", err)
-		os.Exit(1)
-	}
-
-	if *printEvents {
-		for i, ev := range events {
-			fmt.Printf("%02d: %#v\n", i, ev)
-		}
-	}
-	report := gtr.FromEvents(events, *packageName)
-
-	if !*noXMLHeader {
-		fmt.Fprintf(os.Stdout, xml.Header)
-	}
-
-	// TODO: write xml header?
-	enc := xml.NewEncoder(os.Stdout)
-	enc.Indent("", "\t")
-	if err := enc.Encode(gtr.JUnit(report)); err != nil {
-		fmt.Fprintf(os.Stderr, "Error writing XML: %s\n", err)
-		os.Exit(1)
-	}
-	if err := enc.Flush(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error flusing XML: %s\n", err)
-		os.Exit(1)
-	}
-	fmt.Fprintf(os.Stdout, "\n")
-
-	if *setExitCode && report.HasFailures() {
-		os.Exit(1)
-	}
+	fmt.Println("main is a wip.")
 }
-
-// TODO: read/write + test
