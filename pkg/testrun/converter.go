@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mjidris/go-junit-report/junit"
+	"github.com/mjidris/go-junit-report/pkg/junit"
 )
 
 var (
