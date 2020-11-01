@@ -41,11 +41,11 @@ func convert(report Report) testsuites {
 			if test.Result == Fail {
 				tc.Failure = &exception{
 					Message: "Failed",
-					Data:    formatOutput(test.Output, test.Level),
+					Data:    test.Output,
 				}
 			} else if test.Result == Skip {
 				tc.Skipped = &exception{
-					Message: formatOutput(test.Output, test.Level),
+					Message: test.Output,
 				}
 			}
 
@@ -105,30 +105,6 @@ func convert(report Report) testsuites {
 		suites.addSuite(suite)
 	}
 	return suites
-}
-
-func formatOutput(output []string, level int) string {
-	var lines []string
-	for _, line := range output {
-		lines = append(lines, trimOutputPrefix(line, level))
-	}
-	return strings.Join(lines, "\n")
-}
-
-func trimOutputPrefix(line string, level int) string {
-	// We only want to trim the whitespace prefix if it was part of the test
-	// output. Test output is usually prefixed by a series of 4-space indents,
-	// so we'll check for that to decide whether this output was likely to be
-	// from a test.
-	prefixLen := strings.IndexFunc(line, func(r rune) bool { return r != ' ' })
-	if prefixLen%4 == 0 {
-		// Use the subtest level to trim a consistenly sized prefix from the
-		// output lines.
-		for i := 0; i <= level; i++ {
-			line = strings.TrimPrefix(line, "    ")
-		}
-	}
-	return strings.TrimPrefix(line, "\t")
 }
 
 func mergeBenchmarks(benchmarks []Benchmark) []Benchmark {

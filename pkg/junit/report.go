@@ -69,7 +69,7 @@ type Test struct {
 	Duration time.Duration
 	Result   Result
 	Level    int
-	Output   []string
+	Output   string
 }
 
 // Maybe let's get rid of this???
