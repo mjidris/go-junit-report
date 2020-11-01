@@ -16,10 +16,10 @@ type Report struct {
 	Packages []Package
 }
 
-// This function is used to set an error exit code. Unsure if we actually need this.
-func (r *Report) hasFailures() bool {
-	for _, pkg := range r.Packages {
-		for _, t := range pkg.Tests {
+// HasFailures returns true if the report contains any failures.
+func (r *Report) HasFailures() bool {
+	for _, p := range r.Packages {
+		for _, t := range p.Tests {
 			if t.Result == Fail {
 				return true
 			}
