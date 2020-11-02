@@ -13,7 +13,7 @@ import (
 // it's contents will be overwritten with the test results.
 func Write(r Report, file string) error {
 	// Check to see if we have a .xml file extension.
-	if len(file) < 3 || file[len(file)-3:] != ".xml" {
+	if len(file) < 4 || file[len(file)-4:] != ".xml" {
 		file += ".xml"
 	}
 
