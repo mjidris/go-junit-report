@@ -1,5 +1,3 @@
-// Package junit defines a JUnit XML report and includes convenience methods
-// for working with these reports.
 package junit
 
 import (
@@ -8,7 +6,7 @@ import (
 	"time"
 )
 
-// Testsuites is a collection of JUnit testsuites.
+// testsuites is a collection of JUnit testsuites.
 type testsuites struct {
 	XMLName xml.Name `xml:"testsuites"`
 
@@ -31,7 +29,7 @@ func (t *testsuites) addSuite(ts testsuite) {
 	t.Disabled += ts.Disabled
 }
 
-// Testsuite is a single JUnit testsuite containing testcases.
+// testsuite is a single JUnit testsuite containing testcases.
 type testsuite struct {
 	// required attributes
 	Name  string `xml:"name,attr"`
@@ -60,14 +58,14 @@ func (t *testsuite) addProperty(name, value string) {
 
 func (t *testsuite) addTestcase(tc testcase) {
 	t.Testcases = append(t.Testcases, tc)
-	t.Tests += 1
+	t.Tests++
 
 	if tc.Error != nil {
-		t.Errors += 1
+		t.Errors++
 	}
 
 	if tc.Failure != nil {
-		t.Failures += 1
+		t.Failures++
 	}
 }
 
@@ -75,7 +73,7 @@ func (t *testsuite) setTimestamp(u time.Time) {
 	t.Timestamp = u.Format(time.RFC3339)
 }
 
-// Testcase represents a single test with its results.
+// testcase represents a single test with its results.
 type testcase struct {
 	// required attributes
 	Name      string `xml:"name,attr"`
@@ -92,13 +90,13 @@ type testcase struct {
 	SystemErr string     `xml:"system-err,omitempty"`
 }
 
-// Property represents a key/value pair.
+// property represents a key/value pair.
 type property struct {
 	Name  string `xml:"name,attr"`
 	Value string `xml:"value,attr"`
 }
 
-// Exception represents the results of a test that was failed, was skipped
+// exception represents the results of a test that was failed, was skipped
 // or had an error.
 type exception struct {
 	Message string `xml:"message,attr"`

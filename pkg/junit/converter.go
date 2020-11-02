@@ -11,8 +11,7 @@ var (
 	propFieldsFunc = func(r rune) bool { return r == ':' || r == ' ' }
 )
 
-// This can be it's own package
-// JUnit converts the given report to a collection of JUnit Testsuites.
+// convert takes the given report and converts it to a collection of JUnit Testsuites.
 func convert(report Report) testsuites {
 	var suites testsuites
 	for _, pkg := range report.Packages {

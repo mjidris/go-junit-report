@@ -2,16 +2,21 @@ package junit
 
 import "time"
 
+// Result represents the outcome of a test (eg. Pass, Fail, etc.).
 type Result int
 
 const (
+	// Unknown represents a result which is unknown.
 	Unknown Result = iota
+	// Pass represents a successful test result.
 	Pass
+	// Fail represents an unsuccessful test result.
 	Fail
+	// Skip represents a test which was not executed.
 	Skip
 )
 
-// Expose this type.
+// Report represents a collection of packages containing tests.
 type Report struct {
 	Packages []Package
 }
@@ -26,10 +31,12 @@ func (r *Report) HasFailures() bool {
 	return false
 }
 
+// AddPackage adds a package of tests to the report.
 func (r *Report) AddPackage(p Package) {
 	r.Packages = append(r.Packages, p)
 }
 
+// Package is a collection of tests.
 type Package struct {
 	Name     string
 	Duration time.Duration
@@ -53,17 +60,20 @@ func (p *Package) HasFailures() bool {
 	return false
 }
 
+// AddTest adds a single test to the package.
 func (p *Package) AddTest(t Test) {
 	p.Duration += t.Duration
 	p.Tests = append(p.Tests, t)
 }
 
+// AddTests add multiple tests to the package.
 func (p *Package) AddTests(tests ...Test) {
 	for _, t := range tests {
 		p.AddTest(t)
 	}
 }
 
+// Test represents a single test case.
 type Test struct {
 	Name     string
 	Duration time.Duration
@@ -72,7 +82,7 @@ type Test struct {
 	Output   string
 }
 
-// Maybe let's get rid of this???
+// Benchmark represents a single benchmark test case.
 type Benchmark struct {
 	Name        string
 	Result      Result
@@ -84,6 +94,7 @@ type Benchmark struct {
 	AllocsPerOp int64
 }
 
+// Error represents an error that occured during the test.
 type Error struct {
 	Name     string
 	Duration time.Duration
