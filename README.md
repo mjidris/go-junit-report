@@ -1,49 +1,21 @@
 # go-junit-report
 
-Converts `go test` output to an xml report, suitable for applications that
-expect junit xml reports (e.g. [Jenkins](http://jenkins-ci.org)).
-
-[![Build Status][travis-badge]][travis-link]
-[![Report Card][report-badge]][report-link]
+Allows go applications to generate an xml report suitable for applications expecting JUnit xml reports (e.g. [Jenkins](http://jenkins-ci.org)).
 
 ## Installation
 
-Go version 1.2 or higher is required. Install or update using the `go get`
-command:
+Install or update using the `go get` command:
 
 ```bash
-go get -u github.com/jstemmer/go-junit-report
+go get -u github.com/mjidris/go-junit-report
 ```
 
 ## Usage
 
-go-junit-report reads the `go test` verbose output from standard in and writes
-junit compatible XML to standard out.
+Applications can import the `junit` package and create a `Report` to track their test results. A report is simply a collection of `Package` structs, which themselves are a collection of `Test` structs. Each individual test case should be represented by a single `Test` struct. Users can track the result and duration of the test case by updating the `Result` and `Duration` properties respectively.
 
-```bash
-go test -v 2>&1 | go-junit-report > report.xml
-```
+When all test cases are recorded, a report can be generated using the `Write` function which accepts a `Report` struct along with a file name. If the file name does not end with a `.xml` extension, one will be appended.
 
-Note that it also can parse benchmark output with `-bench` flag:
-```bash
-go test -v -bench . -count 5 2>&1 | go-junit-report > report.xml
-```
+## Note
 
-## Contribution
-
-Create an Issue and discuss the fix or feature, then fork the package.
-Clone to github.com/jstemmer/go-junit-report.  This is necessary because go import uses this path.
-Fix or implement feature. Test and then commit change.
-Specify #Issue and describe change in the commit message.
-Create Pull Request. It can be merged by owner or administrator then.
-
-### Run Tests
-
-```bash
-go test
-```
-
-[travis-badge]: https://travis-ci.org/jstemmer/go-junit-report.svg?branch=master
-[travis-link]: https://travis-ci.org/jstemmer/go-junit-report
-[report-badge]: https://goreportcard.com/badge/github.com/jstemmer/go-junit-report
-[report-link]: https://goreportcard.com/report/github.com/jstemmer/go-junit-report
+This repository was forked from [github.com/jstemmer/go-junit-report](https://github.com/jstemmer/go-junit-report) and has been changed significantly. Any contributions to the original repository can be done there.
